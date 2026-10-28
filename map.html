@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRSH — Tour Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: #000; font-family: 'Inter', sans-serif; }
+    #map { height: 100%; width: 100%; background: #0a0a0a; }
+
+    #loading-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.92);
+      color: #fff; font-family: 'Inter', sans-serif;
+      transition: opacity 0.5s ease;
+    }
+    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    #loading-overlay h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    #loading-overlay p { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
+    .loader-track { width: 240px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+    .loader-bar { height: 100%; width: 0%; background: #ff4455; transition: width 0.3s ease; border-radius: 2px; }
+
+    #header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    #header .back-link {
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem;
+      color: #00e5ff; text-decoration: none; letter-spacing: 0.1em;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(0,229,255,0.25);
+      border-radius: 6px;
+      background: rgba(0,229,255,0.06);
+      box-shadow: 0 0 12px rgba(0,229,255,0.15);
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+    #header .back-link:hover {
+      background: rgba(0,229,255,0.12);
+      border-color: #00e5ff;
+      color: #fff;
+      box-shadow: 0 0 24px rgba(0,229,255,0.35);
+    }
+    #header span { color: rgba(255,255,255,0.2); }
+    #header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.08em; color: #fff; flex: 1; }
+
+    .leaflet-control-attribution { background: rgba(0,0,0,0.5) !important; color: rgba(255,255,255,0.3) !important; }
+    .leaflet-control-attribution a { color: rgba(255,255,255,0.4) !important; }
+
+    .marker-label {
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; padding: 4px 8px;
+      color: #fff; font-size: 0.75rem; font-family: 'Inter', sans-serif;
+      white-space: nowrap; pointer-events: none;
+      transform: translate(-50%, -100%);
+      margin-top: -8px;
+    }
+    .marker-label strong { font-weight: 600; }
+    .marker-label small { color: rgba(255,255,255,0.5); margin-left: 4px; }
+
+    .leaflet-popup-content-wrapper { background: rgba(0,0,0,0.9) !important; color: #fff !important; border-radius: 8px !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+    .leaflet-popup-tip { background: rgba(0,0,0,0.9) !important; border-color: rgba(255,255,255,0.1) !important; }
+    .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 0.85rem; margin: 10px 14px !important; }
+    .leaflet-popup-content strong { display: block; font-weight: 600; margin-bottom: 2px; }
+    .leaflet-popup-content small { color: rgba(255,255,255,0.5); }
+
+    /* Sidebar */
+    #sidebar {
+      position: fixed; top: 0; left: -340px; bottom: 0; z-index: 999;
+      width: 320px;
+      background: rgba(0,0,0,0.88); backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex; flex-direction: column;
+      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      padding-top: 52px;
+    }
+    #sidebar.open { left: 0; }
+
+    #sidebar-toggle {
+      position: fixed; top: 56px; left: 0; z-index: 1000;
+      width: 32px; height: 48px;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-left: none; border-radius: 0 6px 6px 0;
+      color: rgba(255,255,255,0.5); font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: left 0.35s cubic-bezier(0.4,0,0.2,1), color 0.2s;
+    }
+    #sidebar-toggle:hover { color: #fff; }
+    #sidebar.open + #sidebar-toggle { left: 320px; }
+
+    #sidebar-flyer {
+      width: 100%; height: 120px; object-fit: cover;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    #sidebar h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: 0.08em;
+      color: #fff; padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    #sidebar-list {
+      flex: 1; overflow-y: auto;
+      padding: 0.5rem 0;
+    }
+    #sidebar-list::-webkit-scrollbar { width: 4px; }
+    #sidebar-list::-webkit-scrollbar-track { background: transparent; }
+    #sidebar-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    .sidebar-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      cursor: pointer; transition: background 0.2s;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-item:hover { background: rgba(255,255,255,0.04); }
+    .sidebar-item.active { background: rgba(255,255,255,0.06); border-left-color: #fff; }
+    .sidebar-item .s-date {
+      font-size: 0.75rem; font-weight: 600; font-family: 'Inter', sans-serif;
+      min-width: 3em; text-align: right; flex-shrink: 0;
+    }
+    .sidebar-item .s-venue {
+      font-size: 0.8rem; color: #fff; line-height: 1.3;
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .sidebar-item .s-city { font-size: 0.7rem; color: rgba(255,255,255,0.4); display: block; }
+    .sidebar-item .s-marker {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    #route-info {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 0.5rem 1rem;
+      color: rgba(255,255,255,0.6); font-size: 0.75rem;
+      font-family: 'Inter', sans-serif; white-space: nowrap;
+      pointer-events: none; transition: opacity 0.5s ease;
+    }
+    #route-info strong { color: #ff4455; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <h2>LOADING MAP</h2>
+    <p id="loading-status">Geocoding locations...</p>
+    <div class="loader-track"><div class="loader-bar" id="loader-bar"></div></div>
+  </div>
+
+  <div id="header">
+    <a href="shows.html" class="back-link">&larr; Shows</a>
+    <h1 id="tour-name">Tour Map</h1>
+  </div>
+
+  <div id="sidebar">
+    <img id="sidebar-flyer" src="" alt="" />
+    <h2 id="sidebar-title">Tour Dates</h2>
+    <div id="sidebar-list"></div>
+  </div>
+  <button id="sidebar-toggle">☰</button>
+
+  <div id="route-info"></div>
+
+  <div id="map"></div>
+
+  <script src="map-data.js?v=2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const tourId = params.get('tour');
+      const tour = tours.find(t => t.id === tourId);
+
+      if (!tour) {
+        document.getElementById('loading-status').textContent = 'Tour not found';
+        return;
+      }
+
+      document.getElementById('tour-name').textContent = tour.name;
+
+      const loadingEl = document.getElementById('loading-overlay');
+      const loaderBar = document.getElementById('loader-bar');
+      const loadingStatus = document.getElementById('loading-status');
+
+      function getDateObj(dateStr) {
+        const parts = dateStr.split('.');
+        return new Date(2026, parseInt(parts[0]) - 1, parseInt(parts[1]));
+      }
+
+      function getShowStatus(dateStr) {
+        const parts = dateStr.split('.').map(Number);
+        const showDate = new Date(2026, parts[0] - 1, parts[1]);
+        const pastThreshold = new Date(2026, parts[0] - 1, parts[1] + 1, 5, 0, 0, 0);
+        const now = new Date();
+        if (now >= pastThreshold) return 'past';
+        if (now >= showDate) return 'present';
+        return 'future';
+      }
+
+      function buildLocations(tour) {
+        const locs = [];
+        locs.push({ label: 'Start: Springfield, MO', query: tour.start.city + ', ' + tour.start.state, type: 'start' });
+        tour.dates.forEach(d => {
+          locs.push({
+            label: d.venue + ' — ' + d.city + ', ' + d.state,
+            query: d.city + ', ' + d.state,
+            date: d.date,
+            venue: d.venue,
+            city: d.city,
+            state: d.state,
+            type: 'stop',
+          });
+        });
+        locs.push({ label: 'End: Springfield, MO', query: tour.start.city + ', ' + tour.start.state, type: 'end' });
+        return locs;
+      }
+
+      function getRouteCoords(locs) {
+        return locs.filter(l => l.coords).map(l => [l.coords.lat, l.coords.lng]);
+      }
+
+      const locations = buildLocations(tour);
+      let geocoded = 0;
+      const total = locations.length;
+
+      async function geocode(query) {
+        const cacheKey = 'geo_' + query.replace(/[^a-zA-Z0-9]/g, '_');
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try { return JSON.parse(cached); } catch(e) {}
+        }
+        try {
+          const url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=1';
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.length > 0) {
+            const result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            try { localStorage.setItem(cacheKey, JSON.stringify(result)); } catch(e) {}
+            return result;
+          }
+        } catch(e) {
+          console.warn('Geocode failed for:', query);
+        }
+        return null;
+      }
+
+      async function geocodeAll() {
+        for (let i = 0; i < locations.length; i++) {
+          const loc = locations[i];
+          loadingStatus.textContent = 'Geocoding: ' + loc.query;
+          loc.coords = await geocode(loc.query);
+          geocoded++;
+          loaderBar.style.width = ((geocoded / total) * 100) + '%';
+          if (i < locations.length - 1) {
+            await new Promise(r => setTimeout(r, 800));
+          }
+        }
+      }
+
+      async function fetchRoute(locs, versionHash) {
+        const coords = getRouteCoords(locs);
+        if (coords.length < 2) return null;
+
+        const cacheKey = 'osrm_' + tour.id + '_' + versionHash;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try { return JSON.parse(cached); } catch(e) {}
+        }
+
+        const maxWpt = 25;
+        let allCoords = [];
+        let totalDist = 0;
+        let totalDur = 0;
+
+        for (let i = 0; i < coords.length - 1; i += maxWpt - 1) {
+          const end = Math.min(i + maxWpt, coords.length);
+          const chunk = coords.slice(i, end);
+          const coordStr = chunk.map(c => c[1] + ',' + c[0]).join(';');
+          const url = 'https://router.project-osrm.org/route/v1/driving/' + coordStr + '?geometries=geojson&overview=full';
+
+          try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.code === 'Ok' && data.routes.length > 0) {
+              const route = data.routes[0];
+              let pts = route.geometry.coordinates.map(c => [c[1], c[0]]);
+              if (i > 0) pts = pts.slice(1);
+              allCoords = allCoords.concat(pts);
+              totalDist += route.distance;
+              totalDur += route.duration;
+            }
+          } catch (e) {
+            console.warn('OSRM chunk failed:', i, e);
+            return null;
+          }
+
+          if (end < coords.length) {
+            loadingStatus.textContent = 'Calculating driving directions...';
+            await new Promise(r => setTimeout(r, 1000));
+          }
+        }
+
+        if (allCoords.length < 2) return null;
+        const result = { coords: allCoords, distance: totalDist, duration: totalDur };
+        try { localStorage.setItem(cacheKey, JSON.stringify(result)); } catch(e) {}
+        return result;
+      }
+
+      function hashTourData(tour) {
+        let s = tour.id;
+        for (const d of tour.dates) {
+          s += '|' + d.date + d.venue + d.city + d.state;
+        }
+        s += '|' + tour.start.city + tour.start.state;
+        let hash = 0;
+        for (let i = 0; i < s.length; i++) {
+          const c = s.charCodeAt(i);
+          hash = ((hash << 5) - hash) + c;
+          hash |= 0;
+        }
+        return hash.toString(36);
+      }
+
+      async function initMap() {
+        const versionHash = hashTourData(tour);
+        const cacheKey = 'tourmap_' + tour.id;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            const cache = JSON.parse(cached);
+            if (cache.version === versionHash && cache.locations && cache.route) {
+              cache.locations.forEach((cl, i) => {
+                if (cl.coords) locations[i].coords = cl.coords;
+              });
+              renderMap(locations, cache.route.path, cache.route.info || null);
+              return;
+            }
+          } catch(e) {}
+        }
+
+        await geocodeAll();
+        const routeResult = await fetchRoute(locations, versionHash);
+        loadingStatus.textContent = 'Rendering map...';
+
+        const hasCoords = locations.some(l => l.coords);
+        if (!hasCoords) {
+          loadingStatus.textContent = 'Failed to load map data';
+          return;
+        }
+
+        if (routeResult) {
+          const cachePayload = {
+            version: versionHash,
+            locations: locations.map(l => ({
+              coords: l.coords,
+              label: l.label,
+              query: l.query,
+              type: l.type,
+              date: l.date,
+              venue: l.venue,
+              city: l.city,
+              state: l.state,
+            })),
+            route: {
+              path: routeResult.coords,
+              info: { distance: routeResult.distance, duration: routeResult.duration },
+            },
+            cachedAt: Date.now(),
+          };
+          try { localStorage.setItem(cacheKey, JSON.stringify(cachePayload)); } catch(e) {}
+        }
+
+        renderMap(locations, routeResult ? routeResult.coords : null, routeResult ? { distance: routeResult.distance, duration: routeResult.duration } : null);
+      }
+
+      function renderMap(locs, routeCoords, routeInfo) {
+        const map = L.map('map', {
+          zoomControl: false,
+          scrollWheelZoom: true,
+          attributionControl: true,
+        });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_3gk0_1_12440e8d1274203819dbdb2d', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 19,
+        }).addTo(map);
+
+        const bounds = [];
+        const markers = [];
+        const sidebarItems = [];
+
+        locs.forEach((loc) => {
+          if (!loc.coords) return;
+          const latlng = [loc.coords.lat, loc.coords.lng];
+          bounds.push(latlng);
+
+          let color, labelText, icon;
+
+          if (loc.type === 'start') {
+            color = '#fbbf24';
+            labelText = '<span style="color:' + color + '">\u2605</span> Start';
+            icon = L.divIcon({
+              className: '',
+              html: '<div style="width:18px;height:18px;background:' + color + ';border:3px solid rgba(251,191,36,0.3);border-radius:50%;box-shadow:0 0 10px rgba(251,191,36,0.3);"></div>',
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+            });
+          } else if (loc.type === 'end') {
+            color = '#f97316';
+            labelText = '<span style="color:' + color + '">\u25A0</span> End';
+            icon = L.divIcon({
+              className: '',
+              html: '<div style="width:18px;height:18px;background:' + color + ';border:3px solid rgba(249,115,22,0.3);border-radius:50%;box-shadow:0 0 10px rgba(249,115,22,0.3);"></div>',
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+            });
+          } else {
+            const status = getShowStatus(loc.date);
+            color = status === 'future' ? '#4ade80' : status === 'present' ? '#00e5ff' : '#ff4455';
+            labelText = '<span style="color:' + color + '">' + loc.date + '</span> ' + loc.venue;
+            const borderColor = status === 'future' ? 'rgba(74,222,128,0.3)' : status === 'present' ? 'rgba(0,229,255,0.3)' : 'rgba(255,68,85,0.3)';
+            const glowColor = status === 'future' ? 'rgba(74,222,128,0.2)' : status === 'present' ? 'rgba(0,229,255,0.2)' : 'rgba(255,68,85,0.2)';
+            icon = L.divIcon({
+              className: '',
+              html: '<div style="width:14px;height:14px;background:' + color + ';border:3px solid ' + borderColor + ';border-radius:50%;box-shadow:0 0 8px ' + glowColor + ';"></div>',
+              iconSize: [14, 14],
+              iconAnchor: [7, 7],
+            });
+          }
+
+          const marker = L.marker(latlng, { icon }).addTo(map);
+
+          let popupContent = '';
+          if (loc.type === 'start') {
+            popupContent = '<strong>Tour Start</strong><small>Springfield, MO</small>';
+          } else if (loc.type === 'end') {
+            popupContent = '<strong>Tour End</strong><small>Springfield, MO</small>';
+          } else {
+            popupContent = '<strong>' + loc.date + ' — ' + loc.venue + '</strong><small>' + loc.city + ', ' + loc.state + '</small>';
+          }
+          marker.bindPopup(popupContent);
+
+          L.marker(latlng, {
+            icon: L.divIcon({
+              className: 'marker-label',
+              html: labelText,
+              iconSize: [0, 0],
+            })
+          }).addTo(map);
+
+          markers.push(marker);
+          sidebarItems.push({ loc, marker, origColor: color });
+        });
+
+        // Draw route polyline
+        const fallbackCoords = getRouteCoords(locs);
+        const drawCoords = routeCoords || fallbackCoords;
+        if (drawCoords.length > 1) {
+          L.polyline(drawCoords, {
+            color: '#ff4455',
+            weight: 2,
+            opacity: 0.7,
+          }).addTo(map);
+        }
+
+        // Draw secondary faint line underneath for glow
+        if (drawCoords.length > 1) {
+          L.polyline(drawCoords, {
+            color: '#ff4455',
+            weight: 6,
+            opacity: 0.12,
+          }).addTo(map);
+        }
+
+        // Show route info
+        const routeInfoEl = document.getElementById('route-info');
+        if (routeInfo) {
+          const mi = (routeInfo.distance / 1609.34).toFixed(0);
+          const hrs = Math.floor(routeInfo.duration / 3600);
+          const mins = Math.round((routeInfo.duration % 3600) / 60);
+          routeInfoEl.innerHTML = 'Route: <strong>' + mi + ' mi</strong> &middot; <strong>' + hrs + 'h ' + mins + 'm</strong> driving';
+        }
+
+        // --- Sidebar ---
+        const sidebarEl = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebarFlyer = document.getElementById('sidebar-flyer');
+        const sidebarList = document.getElementById('sidebar-list');
+
+        sidebarFlyer.src = tour.flyer;
+        sidebarFlyer.onerror = function() { this.style.display = 'none'; };
+
+        toggleBtn.addEventListener('click', () => {
+          sidebarEl.classList.toggle('open');
+          toggleBtn.textContent = sidebarEl.classList.contains('open') ? '\u2715' : '\u2630';
+        });
+
+        let selectedIdx = -1;
+
+        function getHighlightHtml(loc) {
+          if (loc.type === 'start') return '<div style="width:18px;height:18px;background:#fbbf24;border:3px solid rgba(255,255,255,0.9);border-radius:50%;box-shadow:0 0 18px rgba(255,255,255,0.4),0 0 8px #fbbf24;"></div>';
+          if (loc.type === 'end') return '<div style="width:18px;height:18px;background:#f97316;border:3px solid rgba(255,255,255,0.9);border-radius:50%;box-shadow:0 0 18px rgba(255,255,255,0.4),0 0 8px #f97316;"></div>';
+          const status = getShowStatus(loc.date);
+          const color = status === 'future' ? '#4ade80' : status === 'present' ? '#00e5ff' : '#ff4455';
+          return '<div style="width:16px;height:16px;background:' + color + ';border:3px solid rgba(255,255,255,0.9);border-radius:50%;box-shadow:0 0 18px rgba(255,255,255,0.4),0 0 8px ' + color + ';"></div>';
+        }
+
+        function getOrigIconHtml(loc) {
+          if (loc.type === 'start') return '<div style="width:18px;height:18px;background:#fbbf24;border:3px solid rgba(251,191,36,0.3);border-radius:50%;box-shadow:0 0 10px rgba(251,191,36,0.3);"></div>';
+          if (loc.type === 'end') return '<div style="width:18px;height:18px;background:#f97316;border:3px solid rgba(249,115,22,0.3);border-radius:50%;box-shadow:0 0 10px rgba(249,115,22,0.3);"></div>';
+          const status = getShowStatus(loc.date);
+          const color = status === 'future' ? '#4ade80' : status === 'present' ? '#00e5ff' : '#ff4455';
+          const borderColor = status === 'future' ? 'rgba(74,222,128,0.3)' : status === 'present' ? 'rgba(0,229,255,0.3)' : 'rgba(255,68,85,0.3)';
+          const glowColor = status === 'future' ? 'rgba(74,222,128,0.2)' : status === 'present' ? 'rgba(0,229,255,0.2)' : 'rgba(255,68,85,0.2)';
+          return '<div style="width:14px;height:14px;background:' + color + ';border:3px solid ' + borderColor + ';border-radius:50%;box-shadow:0 0 8px ' + glowColor + ';"></div>';
+        }
+
+        function highlightItem(idx) {
+          if (selectedIdx === idx) return;
+          if (selectedIdx >= 0) {
+            const prev = sidebarItems[selectedIdx];
+            const prevSize = prev.loc.type === 'start' || prev.loc.type === 'end' ? [18, 18] : [14, 14];
+            const prevAnchor = prev.loc.type === 'start' || prev.loc.type === 'end' ? [9, 9] : [7, 7];
+            prev.marker.setIcon(L.divIcon({
+              className: '',
+              html: getOrigIconHtml(prev.loc),
+              iconSize: prevSize,
+              iconAnchor: prevAnchor,
+            }));
+            const prevEl = sidebarList.children[selectedIdx];
+            if (prevEl) prevEl.classList.remove('active');
+          }
+          selectedIdx = idx;
+          const cur = sidebarItems[idx];
+          const curSize = cur.loc.type === 'start' || cur.loc.type === 'end' ? [18, 18] : [16, 16];
+          const curAnchor = cur.loc.type === 'start' || cur.loc.type === 'end' ? [9, 9] : [8, 8];
+          cur.marker.setIcon(L.divIcon({
+            className: '',
+            html: getHighlightHtml(cur.loc),
+            iconSize: curSize,
+            iconAnchor: curAnchor,
+          }));
+          const curEl = sidebarList.children[idx];
+          if (curEl) curEl.classList.add('active');
+          map.flyTo(cur.marker.getLatLng(), 10, { duration: 1.2 });
+        }
+
+        function clearHighlight() {
+          if (selectedIdx >= 0) {
+            const prev = sidebarItems[selectedIdx];
+            const prevSize = prev.loc.type === 'start' || prev.loc.type === 'end' ? [18, 18] : [14, 14];
+            const prevAnchor = prev.loc.type === 'start' || prev.loc.type === 'end' ? [9, 9] : [7, 7];
+            prev.marker.setIcon(L.divIcon({
+              className: '',
+              html: getOrigIconHtml(prev.loc),
+              iconSize: prevSize,
+              iconAnchor: prevAnchor,
+            }));
+            const prevEl = sidebarList.children[selectedIdx];
+            if (prevEl) prevEl.classList.remove('active');
+          }
+          selectedIdx = -1;
+        }
+
+        // Build list
+        sidebarItems.forEach(function(item, idx) {
+          const div = document.createElement('div');
+          div.className = 'sidebar-item';
+
+          if (item.loc.type === 'start') {
+            const markerDot = document.createElement('span');
+            markerDot.className = 's-marker';
+            markerDot.style.background = '#fbbf24';
+            div.appendChild(markerDot);
+            const label = document.createElement('span');
+            label.className = 's-venue';
+            label.textContent = 'Tour Start \u2014 Springfield, MO';
+            div.appendChild(label);
+          } else if (item.loc.type === 'end') {
+            const markerDot = document.createElement('span');
+            markerDot.className = 's-marker';
+            markerDot.style.background = '#f97316';
+            div.appendChild(markerDot);
+            const label = document.createElement('span');
+            label.className = 's-venue';
+            label.textContent = 'Tour End \u2014 Springfield, MO';
+            div.appendChild(label);
+          } else {
+            const markerDot = document.createElement('span');
+            markerDot.className = 's-marker';
+            markerDot.style.background = item.origColor;
+            div.appendChild(markerDot);
+            const info = document.createElement('span');
+            info.className = 's-venue';
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 's-date';
+            dateSpan.style.color = item.origColor;
+            dateSpan.textContent = item.loc.date + ' ';
+            info.appendChild(dateSpan);
+            info.appendChild(document.createTextNode(item.loc.venue));
+            const citySpan = document.createElement('span');
+            citySpan.className = 's-city';
+            citySpan.textContent = item.loc.city + ', ' + item.loc.state;
+            info.appendChild(citySpan);
+            div.appendChild(info);
+          }
+
+          div.addEventListener('click', function() {
+            if (selectedIdx === idx) {
+              clearHighlight();
+            } else {
+              highlightItem(idx);
+            }
+          });
+
+          sidebarList.appendChild(div);
+        });
+
+        // Back to shows nav item
+        const backDiv = document.createElement('div');
+        backDiv.className = 'sidebar-item';
+        backDiv.style.borderTop = '1px solid rgba(255,255,255,0.06)';
+        backDiv.style.marginTop = 'auto';
+        const backLink = document.createElement('a');
+        backLink.href = 'shows.html';
+        backLink.style.cssText = 'display:flex;align-items:center;gap:0.75rem;padding:0.6rem 1rem;color:rgba(255,255,255,0.5);text-decoration:none;font-family:Inter,sans-serif;font-size:0.8rem;width:100%;transition:color 0.2s;';
+        backLink.innerHTML = '<span style="font-size:1rem;">&larr;</span> Back to Shows';
+        backLink.onmouseover = function() { this.style.color = '#ff4455'; };
+        backLink.onmouseout = function() { this.style.color = 'rgba(255,255,255,0.5)'; };
+        backDiv.appendChild(backLink);
+        sidebarList.parentElement.appendChild(backDiv);
+
+        // Click on map deselects
+        map.on('click', clearHighlight);
+
+        if (bounds.length > 0) {
+          map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        loadingEl.classList.add('hidden');
+        setTimeout(() => { loadingEl.style.display = 'none'; }, 500);
+      }
+
+      initMap();
+    })();
+
+    // Anti burn-in: pixel shift
+    (function() {
+      var idx = 0;
+      var positions = [[0,0],[1,1],[0,0],[-1,-1],[0,0],[1,-1],[0,0],[-1,1]];
+      function shift() {
+        idx = (idx + 1) % positions.length;
+        document.body.style.transform = 'translate(' + positions[idx][0] + 'px,' + positions[idx][1] + 'px)';
+        document.body.style.transition = 'transform 2.5s ease-in-out';
+      }
+      setTimeout(function() { shift(); setInterval(shift, 180000); }, 120000);
+    })();
+  </script>
+</body>
+</html>

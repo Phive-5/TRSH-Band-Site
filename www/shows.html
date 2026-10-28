@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>TRSH — Shows</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <script src="version.js"></script>
+  <script>document.write('<link rel="stylesheet" href="style.css?v=' + SITE_VERSION + '">');</script>
+</head>
+<body id="shows-page">
+
+  <div class="bg-slideshow" id="bgSlideshow"></div>
+  <div class="overlay" id="overlay"></div>
+  <div class="vignette" id="vignette"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">TRSH</a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#" style="text-decoration: line-through;">Music</a></li>
+          <li><a href="shows.html" class="active">Shows</a></li>
+          <li><a href="#" style="text-decoration: line-through;">Store</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="#" style="text-decoration: line-through;">Bio</a></li>
+          <li><a href="#" style="text-decoration: line-through;">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <svg style="position:absolute;width:0;height:0;overflow:hidden;">
+    <defs>
+      <filter id="eye-stroke" x="-50%" y="-50%" width="200%" height="200%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="expanded"/>
+        <feFlood flood-color="#1a1a1a" result="outlineColor"/>
+        <feComposite in="outlineColor" in2="expanded" operator="in" result="outline"/>
+        <feMerge>
+          <feMergeNode in="outline"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <main class="hero hero--shows">
+    <div class="hero-content">
+
+      <div class="year-toggle">
+        <span class="year-option" data-year="2026">2026</span>
+        <span class="year-separator">|</span>
+        <span class="year-option" data-year="2027">2027</span>
+      </div>
+
+      <div class="year-content" data-year="2026">
+      <div class="show-entry" data-tour="freethrow">
+        <img src="Flyers/FreeThrow MBtW Tour 2026.jpg" alt="FreeThrow MBtW Tour flyer" class="flyer-thumb" data-flyer>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">4.12</span>
+            <span class="show-venue">Delmar Hall</span>
+            <span class="show-location">St. Louis, MO</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.13</span>
+            <span class="show-venue">The Waiting Room</span>
+            <span class="show-location">Omaha, NE</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.16</span>
+            <span class="show-venue">Summit Music Hall</span>
+            <span class="show-location">Denver, CO</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.17</span>
+            <span class="show-venue">Soundwell</span>
+            <span class="show-location">Salt Lake City, UT</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.18</span>
+            <span class="show-venue">Shrine Ballroom</span>
+            <span class="show-location">Boise, ID</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.19</span>
+            <span class="show-venue">Revolution Hall</span>
+            <span class="show-location">Portland, OR</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.20</span>
+            <span class="show-venue">The Showbox</span>
+            <span class="show-location">Seattle, WA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.22</span>
+            <span class="show-venue">The UC Theatre</span>
+            <span class="show-location">Berkeley, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.23</span>
+            <span class="show-venue">Observatory OC</span>
+            <span class="show-location">Santa Ana, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.24</span>
+            <span class="show-venue">The Observatory North Park</span>
+            <span class="show-location">San Diego, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.25</span>
+            <span class="show-venue">The Van Buren</span>
+            <span class="show-location">Phoenix, AZ</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.27</span>
+            <span class="show-venue">Paper Tiger</span>
+            <span class="show-location">San Antonio, TX</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">4.28</span>
+            <span class="show-venue">Tannahill's</span>
+            <span class="show-location">Fort Worth, TX</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.01</span>
+            <span class="show-venue">The Masquerade</span>
+            <span class="show-location">Atlanta, GA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.02</span>
+            <span class="show-venue">The Underground</span>
+            <span class="show-location">Charlotte, NC</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.03</span>
+            <span class="show-venue">The National</span>
+            <span class="show-location">Richmond, VA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.05</span>
+            <span class="show-venue">Soundstage</span>
+            <span class="show-location">Baltimore, MD</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.07</span>
+            <span class="show-venue">Paradise</span>
+            <span class="show-location">Boston, MA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.08</span>
+            <span class="show-venue">Webster Hall</span>
+            <span class="show-location">New York, NY</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.09</span>
+            <span class="show-venue">Union Transfer</span>
+            <span class="show-location">Philadelphia, PA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.11</span>
+            <span class="show-venue">Electric City</span>
+            <span class="show-location">Buffalo, NY</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.12</span>
+            <span class="show-venue">Opera House</span>
+            <span class="show-location">Toronto, ON</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.14</span>
+            <span class="show-venue">Bogart's</span>
+            <span class="show-location">Cincinnati, OH</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.15</span>
+            <span class="show-venue">The Roxy</span>
+            <span class="show-location">Cleveland, OH</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.16</span>
+            <span class="show-venue">Crofoot Ballroom</span>
+            <span class="show-location">Detroit, MI</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">5.17</span>
+            <span class="show-venue">House of Blues</span>
+            <span class="show-location">Chicago, IL</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="show-divider"></div>
+
+      <div class="show-entry" data-tour="flight-patterns">
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <img src="Flyers/TRSH-flight_Patterns-halftimeshow-2026.jpg" alt="Flight Patterns flyer" class="flyer-thumb" data-flyer>
+          <img src="Flyers/Art of a fake laugh-ace of cups.jpg" alt="Ace of Cups show flyer" class="flyer-thumb" data-flyer>
+        </div>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">6.18</span>
+            <span class="show-venue">Mag Bar</span>
+            <span class="show-location">Louisville, KY</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">6.19</span>
+            <span class="show-venue">Mr. Roboto Project</span>
+            <span class="show-location">Pittsburgh, PA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">6.20</span>
+            <span class="show-venue">Camp Punksylvania</span>
+            <span class="show-location">West End Fairgrounds, Gilbert, PA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">6.22</span>
+            <span class="show-venue">Ace of Cups</span>
+            <span class="show-location">Columbus, OH</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="show-divider"></div>
+
+      <div class="show-entry" data-tour="shoreline">
+        <img src="Flyers/Shoreline Summer Fest 2026.jpg" alt="Shoreline Summer Fest flyer" class="flyer-thumb" data-flyer>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">7.11</span>
+            <span class="show-venue">Armada Brewing</span>
+            <span class="show-location">New Haven, CT</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="show-divider"></div>
+
+      <div class="show-entry" data-tour="fling-the-springs">
+        <img src="Flyers/Trsh&Rubes- Fling the Springs- Goverment Springs Park 509 E. Oklahoma Ave Enid OK 73701- October 3rd 2026.jpg" alt="Fling the Springs flyer" class="flyer-thumb" data-flyer>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">10.3</span>
+            <span class="show-venue">Government Springs Park</span>
+            <span class="show-location">Enid, OK</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="show-divider"></div>
+
+      <div class="show-entry" data-tour="ceremony">
+        <img src="Flyers/Ceremony Festival 2026.jpg" alt="Ceremony Festival flyer" class="flyer-thumb" data-flyer>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">10.12</span>
+            <span class="show-venue">Cannery Hall</span>
+            <span class="show-location">Nashville, TN</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="show-divider"></div>
+
+      <div class="show-entry" data-tour="gone-fishin">
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <img src="Flyers/Gone Fishin Tour - 2026.jpg" alt="Gone Fishin Tour flyer" class="flyer-thumb" data-flyer>
+          <img src="Flyers/TRSH - Adjust the sails-2026.jpg" alt="Adjust the sails flyer" class="flyer-thumb" data-flyer>
+          <img src="Flyers/TRSH-Adjust the sails-Holland project-2026.jpg" alt="Adjust the sails Holland Project flyer" class="flyer-thumb" data-flyer>
+        </div>
+        <div class="shows-list">
+          <div class="show-item">
+            <span class="show-date">11.4</span>
+            <span class="show-venue">Wave</span>
+            <span class="show-location">Wichita, KS</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.5</span>
+            <span class="show-venue">The Vanguard</span>
+            <span class="show-location">Tulsa, OK</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.6</span>
+            <span class="show-venue">89th Street</span>
+            <span class="show-location">Oklahoma City, OK</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.7</span>
+            <span class="show-venue">Puzzles</span>
+            <span class="show-location">Dallas, TX</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.9</span>
+            <span class="show-venue">Lowbrow Palace</span>
+            <span class="show-location">El Paso, TX</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.10</span>
+            <span class="show-venue">191 Toole</span>
+            <span class="show-location">Tucson, AZ</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.12</span>
+            <span class="show-venue">Strummer's</span>
+            <span class="show-location">Fresno, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.13</span>
+            <span class="show-venue">Transplants Brewery</span>
+            <span class="show-location">Palmdale, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.14</span>
+            <span class="show-venue">The Ritz</span>
+            <span class="show-location">San Jose, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.15</span>
+            <span class="show-venue">The Holland Project</span>
+            <span class="show-location">Reno, NV</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.16</span>
+            <span class="show-venue">The Starlet Room</span>
+            <span class="show-location">Sacramento, CA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.18</span>
+            <span class="show-venue">Grey Witch</span>
+            <span class="show-location">Las Vegas, NV</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.20</span>
+            <span class="show-venue">Backstage at Revel</span>
+            <span class="show-location">Albuquerque, NM</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">11.21</span>
+            <span class="show-venue">The Black Sheep</span>
+            <span class="show-location">Colorado Springs, CO</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.3</span>
+            <span class="show-venue">RecordBar</span>
+            <span class="show-location">Kansas City, MO</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.4</span>
+            <span class="show-venue">Fernie's High Horse</span>
+            <span class="show-location">Urbana, IL</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.5</span>
+            <span class="show-venue">X-Ray Arcade</span>
+            <span class="show-location">Milwaukee, WI</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.6</span>
+            <span class="show-venue">The Pyramid Scheme</span>
+            <span class="show-location">Grand Rapids, MI</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.8</span>
+            <span class="show-venue">The Blind Pig</span>
+            <span class="show-location">Ann Arbor, MI</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.9</span>
+            <span class="show-venue">Musica</span>
+            <span class="show-location">Akron, OH</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.10</span>
+            <span class="show-venue">Montage Music Hall</span>
+            <span class="show-location">Rochester, NY</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.11</span>
+            <span class="show-venue">Higher Ground</span>
+            <span class="show-location">Burlington, VT</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.12</span>
+            <span class="show-venue">3S Artspace</span>
+            <span class="show-location">Portsmouth, NH</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.13</span>
+            <span class="show-venue">Rockhopper</span>
+            <span class="show-location">Milford, CT</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.15</span>
+            <span class="show-venue">Jammin Java</span>
+            <span class="show-location">Vienna, VA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.16</span>
+            <span class="show-venue">The Annex</span>
+            <span class="show-location">Norfolk, VA</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.17</span>
+            <span class="show-venue">Stanczyks</span>
+            <span class="show-location">Durham, NC</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.18</span>
+            <span class="show-venue">Reggie's</span>
+            <span class="show-location">Wilmington, NC</span>
+          </div>
+          <div class="show-item">
+            <span class="show-date">12.19</span>
+            <span class="show-venue">The Radio Room</span>
+            <span class="show-location">Greenville, SC</span>
+          </div>
+        </div>
+        <div class="eye-icon-wrap">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#eye-stroke)">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="year-content" data-year="2027" style="display:none;">
+        <div class="no-shows">No shows scheduled for 2027 yet.</div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="year-watermark" id="yearWatermark">2026</div>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="Flyer full view">
+  </div>
+
+  <div class="social-bar">
+    <a href="https://www.instagram.com/trsh.midwest/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <a href="https://open.spotify.com/artist/5Sc8WcS3n1oX5iSGlXD2j9" target="_blank" rel="noopener" class="social-link" aria-label="Spotify">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@derekberry69" target="_blank" rel="noopener" class="social-link" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@trshmdwst4047" target="_blank" rel="noopener" class="social-link" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://x.com/TRSH_MIDWEST" target="_blank" rel="noopener" class="social-link" aria-label="Twitter">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <a href="https://www.facebook.com/midwest.trsh" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </a>
+  </div>
+
+  <script>document.write('<script src="script.js?v=' + SITE_VERSION + '"><\/script>');</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = lightbox.querySelector('img');
+      const overlay = document.getElementById('overlay');
+      const hero = document.querySelector('.hero--shows');
+
+      document.querySelectorAll('[data-flyer]').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+          lightboxImg.src = thumb.src;
+          lightbox.classList.add('open');
+        });
+      });
+
+      lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('open');
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') lightbox.classList.remove('open');
+      });
+
+      const vignette = document.getElementById('vignette');
+
+      hero.addEventListener('scroll', () => {
+        vignette.classList.toggle('vignette--active', hero.scrollTop > 0);
+      });
+
+      document.addEventListener('click', () => {
+        vignette.classList.toggle('vignette--active');
+      });
+
+      // Year toggle logic
+      const currentYear = new Date().getFullYear();
+      const availableYears = [2026, 2027];
+      let activeYear = availableYears.includes(currentYear) ? currentYear : 2026;
+
+      function setYear(year) {
+        activeYear = year;
+        document.querySelectorAll('.year-content').forEach(el => {
+          el.style.display = (parseInt(el.dataset.year) === year) ? '' : 'none';
+        });
+        document.querySelectorAll('.year-option').forEach(el => {
+          el.classList.toggle('active', parseInt(el.dataset.year) === year);
+        });
+        const wm = document.getElementById('yearWatermark');
+        if (wm) wm.textContent = year;
+      }
+
+      document.querySelectorAll('.year-option').forEach(el => {
+        el.addEventListener('click', () => setYear(parseInt(el.dataset.year)));
+      });
+
+      setYear(activeYear);
+
+      function getShowStatus(dateStr) {
+        const parts = dateStr.split('.').map(Number);
+        const showDate = new Date(2026, parts[0] - 1, parts[1]);
+        const pastThreshold = new Date(2026, parts[0] - 1, parts[1] + 1, 5, 0, 0, 0);
+        const now = new Date();
+        if (now >= pastThreshold) return 'past';
+        if (now >= showDate) return 'present';
+        return 'future';
+      }
+
+      document.querySelectorAll('.show-date').forEach(el => {
+        const status = getShowStatus(el.textContent.trim());
+        el.classList.remove('show-date--future', 'show-date--present');
+        if (status === 'future') el.classList.add('show-date--future');
+        else if (status === 'present') el.classList.add('show-date--present');
+      });
+
+      document.querySelectorAll('.eye-icon-wrap').forEach(wrap => {
+        wrap.addEventListener('click', () => {
+          const entry = wrap.closest('.show-entry');
+          if (entry) {
+            const tourId = entry.dataset.tour;
+            if (tourId) window.location.href = 'map.html?tour=' + tourId;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

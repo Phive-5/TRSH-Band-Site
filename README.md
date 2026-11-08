@@ -1,6 +1,6 @@
 # TRSH Band Site
 
-Static website for the band **TRSH** ("Trash from the Midwest"). Built with plain HTML, CSS, and vanilla JavaScript — no build step, no framework.
+Static website for the band **TRSH**. Built with plain HTML, CSS, and vanilla JavaScript — no build step, no framework.
 
 ## Features
 

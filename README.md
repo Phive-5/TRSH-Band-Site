@@ -1,6 +1,7 @@
 # TRSH Band Site
 
 Static website for the band **TRSH**. Built with plain HTML, CSS, and vanilla JavaScript — no build step, no framework.
+[View site here](https://phive-5.github.io/TRSH-Band-Site/index.html)
 
 ## Features
 
